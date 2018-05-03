@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="review">
+	<!-- 댓글 목록 - 글번호로 댓글 가져오기 -->
+	<select id="reviewlist" resultType="com.lms.model.vo.ReviewVO">
+	   SELECT * FROM REVIEW 
+		WHERE COURSENO = #{courseno}
+		 ORDER BY REVIEWNO DESC
+	</select>
+	
+	<!-- 댓글번호로 가져오기 -->
+	<select id="reviewsearch" resultType="com.lms.model.vo.ReviewVO">
+	   SELECT * FROM REVIEW 
+		WHERE REVIEWNO = #{reviewno}
+		ORDER BY REVIEWNO DESC
+	</select>
+
+	<!-- 댓글 입력 -->	
+	<insert id="reviewinsert" parameterType="com.lms.model.vo.ReviewVO">
+		INSERT INTO review 
+		(reviewno, courseno, writer, rcontent, writedate) VALUES 
+		(reviewno.nextval, #{courseno}, #{writer}, #{rcontent}, sysdate)		
+	</insert>
+	
+	<!--댓글 수정 -->
+	<update id="reviewupdate" parameterType="com.lms.model.vo.ReviewVO">
+		UPDATE review
+		   SET rcontent = #{rcontent}
+		WHERE reviewno = #{reviewno}
+	</update>
+	
+	<!-- 댓글 삭제 --> 
+	<delete id="reviewdelete" parameterType="string">
+		DELETE FROM review
+		WHERE reviewno = #{reviewno}
+	</delete>
+</mapper>

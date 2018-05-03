@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="course">	
+	<select id="getTotalCount" resultType="int">
+		SELECT COUNT(courseno) cnt FROM course
+	</select>
+	
+	<!-- 강의 목록 -->
+	<select id="courselist" parameterType="map" resultType="com.lms.model.vo.CourseVO">
+		select b.rnum, b.*
+		from ( 
+		    select rownum as rnum, a.*
+		    from (
+		        select courseno, coursename, memberno, name, startdate, enddate, content, filename
+		        from course
+		        order by courseno desc) a
+		    where rownum <![CDATA[<=]]> #{end}) b
+		where b.rnum <![CDATA[>=]]> #{start}
+	</select>
+	
+	<!-- 내 강의 목록 (강사) -->
+	<select id="teacherCourseList" parameterType="map" resultType="com.lms.model.vo.CourseVO">
+		select b.rnum, b.*
+		from ( 
+		    select rownum as rnum, a.*
+		    from (
+		        select courseno, coursename, memberno, name, startdate, enddate, content, filename
+		        from course
+		        WHERE memberno = #{memberno}
+		        order by courseno desc) a
+		    where rownum <![CDATA[<=]]> #{end}) b
+		where b.rnum <![CDATA[>=]]> #{start}
+	</select>
+	
+	<select id="courselist2" parameterType="com.lms.model.vo.CourseVO" resultType="com.lms.model.vo.CourseVO">
+		SELECT courseno, coursename, memberno, name, startdate, enddate, content, filename
+		FROM course
+		<where>
+			<if test="memberno != null">
+				memberno = #{memberno}
+			</if>
+			
+		</where>
+		ORDER BY courseno
+	</select>
+
+	<select id="coursedetail" parameterType="string" resultType="com.lms.model.vo.CourseVO">
+		SELECT courseno, coursename, memberno, name, startdate, enddate, content, filename
+		FROM course
+		WHERE courseno = #{courseno}
+	</select>
+	
+	<!-- attendlist1 수강관리 : 수강신청된 강의 리스트 -->
+	<select id="attendcourselist" resultType="com.lms.model.vo.CourseVO">
+		SELECT courseno, coursename, memberno, name
+		FROM course
+		WHERE courseno IN (
+			SELECT courseno
+			FROM attend 
+	        GROUP BY courseno)
+	</select>
+	
+	<insert id="courseinsert" parameterType="com.lms.model.vo.CourseVO">
+		INSERT INTO course 
+		(courseno, coursename, memberno, name, content, filename)
+		VALUES 
+		(course_seq.nextval, #{coursename}, #{memberno}, #{name}, #{content}, #{filename})
+	</insert>
+	
+	
+	<!-- 강의 수정 -->
+	<update id="courseUpdate" parameterType="com.lms.model.vo.CourseVO">
+		UPDATE COURSE 
+		   SET COURSENAME = #{coursename},
+			   NAME = #{name},
+			   STARTDATE = #{startdate},
+			   ENDDATE = #{enddate},
+			   CONTENT = #{content},
+			   FILENAME = #{filename}
+		 WHERE COURSENO = #{courseno}  	   
+	</update>
+	
+	<!-- 강의 삭제 -->
+	<delete id="courseDelete" parameterType="String">
+		DELETE FROM COURSE WHERE COURSENO = #{courseno }
+	</delete>
+</mapper>

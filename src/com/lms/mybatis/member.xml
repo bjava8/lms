@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">	
+	<!-- 회원 목록 -->
+	<select id="memberlist" resultType="com.lms.model.vo.MemberVO">
+		SELECT memberno, id, name, pw, email, phone, memberlevel 
+		FROM member
+		ORDER BY memberno
+	</select>
+	
+	<!-- 회원 상세 -->
+	<select id="memberdetail" parameterType="string" resultType="com.lms.model.vo.MemberVO">
+		SELECT memberno, id, name, pw, email, phone, memberlevel 
+		FROM member
+		WHERE memberno = #{memberno}
+	</select>
+	
+	<!-- 회원 입력 -->
+	<insert id="memberinsert" parameterType="com.lms.model.vo.MemberVO">
+		INSERT INTO member (memberno, id, name, pw, email, phone, memberlevel) VALUES 
+		(member_seq.nextval, #{id}, #{name}, #{pw}, #{email}, #{phone}, '1')
+	</insert>
+	
+	<!-- 회원 수정 -->
+	<update id="memberupdate" parameterType="com.lms.model.vo.MemberVO">
+		UPDATE member
+		<set>
+			<if test="pw != null">pw = #{pw},</if>
+			<if test="email != null">email=#{email},</if>
+			<if test="phone != null">phone=#{phone},</if>
+			<if test="memberlevel != null">memberlevel=#{memberlevel}</if>
+		</set>
+		WHERE memberno = #{memberno}
+	</update>
+	
+	<!-- 회원 삭제 -->
+	<delete id="memberdelete" parameterType="string">
+		DELETE FROM member
+		WHERE memberno = #{memberno}
+	</delete>
+	
+	<!-- 회원 로그인 -->
+	<select id="login" parameterType="map" resultType="com.lms.model.vo.MemberVO">
+		SELECT memberno, id, name, pw, email, phone, memberlevel 
+		FROM member
+		WHERE id = #{id} AND pw = #{pw}
+	</select>
+	
+	<!-- 아이디 검증 -->
+	<select id="checkid" parameterType="string" resultType="int">
+		SELECT COUNT(memberno) cnt
+		FROM member
+		WHERE id = #{id}
+	</select>
+</mapper>

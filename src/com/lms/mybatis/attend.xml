@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="attend">
+
+<!-- 
+	<select id="attendlist" parameterType="string" resultType="com.lms.model.vo.AttendVO">
+		SELECT attendno, courseno, memberno, allow  
+ 		FROM attend 
+		WHERE memberno = #{memberno} 
+ 		ORDER BY attendno 
+	</select> 
+-->
+	
+<!-- 	<select id="attendlist" parameterType="com.lms.model.vo.AttendVO" resultType="com.lms.model.vo.AttendVO">
+		SELECT attendno, courseno, memberno, allow 
+		FROM attend
+		<if test="memberno != null">
+		WHERE memberno = #{memberno}
+		</if>
+		<if test="courseno != null">
+		WHERE courseno = #{courseno}
+		</if>
+		ORDER BY attendno
+	</select> -->
+	
+	<!-- [관리자] 강의 별 수강신청 학생 목록 -->
+	<select id="attendlistm" parameterType="string" resultType="com.lms.model.vo.AttendVO">
+		SELECT a.attendno, a.courseno, a.memberno, a.allow, a.grade, m.name
+		FROM attend a INNER JOIN member m
+        ON m.memberno = a.memberno
+        WHERE a.courseno = #{courseno}
+		ORDER BY attendno
+	</select>
+	
+	<!-- [학생] 내 강의 목록  -->
+	<select id="memberAttendList" parameterType="string" resultType="com.lms.model.vo.AttendVO">
+		SELECT a.attendno, a.courseno, a.memberno, a.allow, c.coursename, c.name
+		FROM attend a INNER JOIN course c
+		ON c.courseno = a.courseno
+		WHERE a.memberno = #{memberno}
+		ORDER BY attendno
+	</select>
+	
+	<select id="attendlist" parameterType="com.lms.model.vo.AttendVO" resultType="com.lms.model.vo.AttendVO">
+		SELECT a.attendno, a.courseno, a.memberno, a.allow, c.coursename, c.name
+		FROM attend a INNER JOIN course c
+		ON c.courseno = a.courseno
+		<if test="memberno != null">
+		WHERE a.memberno = #{memberno}
+		</if>
+		<if test="courseno != null">
+        WHERE a.courseno = #{courseno}
+        </if>
+		ORDER BY attendno
+	</select>
+	
+	<select id="attenddetail" parameterType="string" resultType="com.lms.model.vo.AttendVO">
+		SELECT attendno, courseno, memberno, allow, grade
+		FROM attend
+		WHERE attendno = #{attendno}
+	</select>
+	
+	<select id="attendcnt" parameterType="com.lms.model.vo.AttendVO" resultType="int">
+		SELECT count(attendno) cnt
+		FROM attend
+		WHERE courseno = #{courseno} AND memberno = #{memberno}
+	</select>
+	
+	<insert id="attendinsert" parameterType="com.lms.model.vo.AttendVO">		
+		INSERT INTO attend (attendno, courseno, memberno, allow) VALUES 
+		(attend_seq.nextval, #{courseno}, #{memberno}, 'N')
+	</insert>
+	
+	<update id="attendupdate" parameterType="com.lms.model.vo.AttendVO">
+		UPDATE attend
+		<set>
+			<if test="allow != null and allow != ''" >allow = #{allow},</if>
+			<if test="grade != null and grade != ''">grade = #{grade}</if>
+		</set>
+		WHERE attendno = #{attendno}
+	</update>
+	
+	<delete id="attenddelete" parameterType="string">
+		DELETE FROM attend
+		WHERE attendno = #{attendno}
+	</delete>
+	
+	
+</mapper>
